@@ -4,20 +4,22 @@
       <li>Cancel</li>
     </ul>
     <ul class="header-button-right">
-      <li>Next</li>
+      <li v-if="step == 1" @click="step++">Next</li>
+      <li v-if="step == 2" @click="publish">Publish</li>
     </ul>
     <img src="./assets/logo.png" class="logo" />
   </div>
 
-  <MainContainer :snsData="snsData" />
+  <MainContainer :snsData="snsData" :step="step" :uploadImage="uploadImage" @write="writeContent = $event" />
   <button @click="more">더보기</button>
 
   <div class="footer">
     <ul class="footer-button-plus">
-      <input type="file" id="file" class="inputfile" />
+      <input @change="upload" type="file" id="file" class="inputfile" />
       <label for="file" class="input-plus">+</label>
     </ul>
- </div>
+  </div>
+
 </template>
 
 <script>
@@ -31,6 +33,9 @@ export default {
     return {
       snsData,
       clickNum: 0,
+      step: 0,
+      uploadImage: null,
+      writeContent: '',
     }
   },
   components: {
@@ -44,7 +49,29 @@ export default {
         this.snsData.push(result.data);
         this.clickNum++;
       });
-    }
+    },
+    upload(e) {
+      let 파일 = e.target.files;
+      console.log(파일[0]);
+      let url = URL.createObjectURL(파일[0]);
+      console.log(url);
+      this.step++;
+      this.uploadImage = url;
+    },
+    publish() {
+      let myPost = {
+        name: "Jeong kisoo",
+        userImage: "https://placeimg.com/100/100/arch",
+        postImage: this.uploadImage,
+        likes: 306,
+        date: "May 30",
+        liked: false,
+        content: this.writeContent,
+        filter: "perpetua"
+      };
+      this.snsData.unshift(myPost);
+      this.step = 0;
+    },
   }
 }
 </script>
